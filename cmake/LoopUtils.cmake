@@ -1,0 +1,11 @@
+macro(__efl_increment __var)
+  MATH(EXPR ${__var} "${${__var}}+1")
+endmacro()
+
+macro(__efl_bound_loop __var __max)
+  __efl_increment(${__var})
+  if(${__var} GREATER_EQUAL ${__max})
+    message(WARNING "[efl] Exited loop after ${__max} iterations.")
+    break()
+  endif()
+endmacro()
