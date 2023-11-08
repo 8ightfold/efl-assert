@@ -20,12 +20,7 @@ set(__EFL_ASSERT_EXPECT ${__EFL_ASSERT_EXPECT}
   CACHE STRING "Body for __builtin_expect wrapper.")
 
 ##=== Assert Parsing ===##
-__efl_assert_find_any(
-  Ruby 
-  Perl 
-  Python
-)
-
+__efl_assert_find_any(Perl Ruby Python)
 if(DEFINED __EFL_ASSERT_SCRIPT_LANG)
   set(__EFL_ASSERT_SCRIPT_EXE ${${__EFL_ASSERT_SL}_EXECUTABLE})
   set(__EFL_ASSERT_SCRIPT_VER ${${__EFL_ASSERT_SL}_VERSION})
@@ -41,7 +36,7 @@ else()
     "[efl::assert] Could not locate a scripting language (Perl, Ruby, Python).")
 endif()
 
-if(NOT "${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Ruby")
+if("${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Python")
   message(SEND_ERROR 
     "${__EFL_ASSERT_SCRIPT_LANG} is currently unsupported.")
 endif()
@@ -69,6 +64,7 @@ list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/include")
 list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/submodules/efl-config/include")
 list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DEFLI_ASSERT_USE_CODEGENNED_=1")
 check_cxx_source_compiles("#include \"CompileTest.cpp\"" USE_CODEGENNED)
+
 set(__EFL_ASSERT_USE_CODEGENNED ${USE_CODEGENNED} 
   CACHE BOOL "Whether or not to use codegenned header.")
 __efl_assert_propagate(__EFL_ASSERT_USE_CODEGENNED)

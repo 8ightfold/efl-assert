@@ -3,7 +3,7 @@ include_guard(DIRECTORY)
 
 project(
   efl-assert
-  VERSION 0.1.0
+  VERSION 0.1.1
   LANGUAGES CXX
 )
 
