@@ -27,39 +27,17 @@
 #ifndef EFL_ASSERT_ASSERTGEN_HPP
 #define EFL_ASSERT_ASSERTGEN_HPP
 
-#include <string>
+#include <efl/AssertGenFormatter.hpp>
 
-namespace efl {
-namespace assert {
-    template <typename T>
-    std::string get_string(T&& t) {
-        return std::to_string(std::forward<T>(t));
-    }
-
-    template <std::size_t N>
-    std::string get_string(const char(&arr)[N]) {
-        return std::string(arr);
-    }
-
-    std::string get_string(const std::string& s) {
-        return s;
-    }
-
-    std::string parse_args() {
-        return "";
-    }
-
-    template <typename Arg, typename...Args>
-    std::string parse_args(Arg&& arg, Args&&...args) {
-        return get_string(std::forward<Arg>(arg)) + 
-            parse_args(std::forward<Args>(args)...);
-    }
-} // namespace assert
-} // namespace efl
-
+//=== Exposed API ===//
 #define EflAssert(chk, str) EFLI_ASSERT_BOX_(EFLI_ASSERT_EXPECT_((chk)), str)
-#define EflDynAssert(chk, ...) EflAssert(chk, ::efl::assert::parse_args(__VA_ARGS__).c_str())
+#define EflDynAssert(chk, ...) EflAssert(chk, EflDynAssertFormatter(__VA_ARGS__))
 
+#ifndef EflDynAssertFormatter
+#  define EflDynAssertFormatter(...) EflDynAssertDefaultFormatter(__VA_ARGS__)
+#endif
+
+//=== Implementation ===//
 #define EFLI_ASSERT_EXPECT_(chk)  @__EFL_ASSERT_EXPECT@
 #define EFLI_ASSERT_BOX_(chk, str) @__EFL_ASSERT_DEFINITION@
 

@@ -25,31 +25,44 @@
 #ifndef EFL_ASSERT_ASSERTFALLBACK_HPP
 #define EFL_ASSERT_ASSERTFALLBACK_HPP
 
-#if defined(COMPILER_GCC) || defined(COMPILER_ICC)
-#  define EflAssert(chk, str) EFLI_ASSERT_BEXPECT_((chk), str)
-#elif defined(COMPILER_CLANG)
-#  if __has_builtin(__builtin_expect)
-#    define EflAssert(chk, str) EFLI_ASSERT_BEXPECT_((chk), str)
-#  else
-#    define EflAssert(chk, str) EFLI_ASSERT_DEFAULT_((chk), str)
-#  endif
-#else
-#  define EflAssert(chk, str) EFLI_ASSERT_DEFAULT_((chk), str)
+#include <efl/Config.hpp>
+
+//=== Exposed API ===//
+#define EflAssert(chk, str) EFLI_ASSERT_BOX_(EFLI_ASSERT_EXPECT_(!(chk)), str)
+#define EflDynAssert(chk, ...) assert(chk)
+
+#ifndef EflDynAssertFormatter
+#  define EflDynAssertFormatter(...) "Dynamic Assertion"
 #endif
 
-/// For compilers with `__builtin_expect(v, probability)`
-#define EFLI_ASSERT_BEXPECT_(chk, str) \
-  EFLI_ASSERT_BOX_(__builtin_expect((!(chk)), 0), str)
+//=== Implementation ===//
+#ifdef __has_builtin
+#  define EFLI_ASSERT_HBUILTIN_(n) __has_builtin(n)
+#else
+#  define EFLI_ASSERT_HBUILTIN_(...) 0
+#endif
 
-/// For compilers with with no special features
-#define EFLI_ASSERT_DEFAULT_(chk, str) \
-  EFLI_ASSERT_BOX_((!(chk)), str)
+#if EFLI_ASSERT_HBUILTIN_(__builtin_expect)
+#  define EFLI_ASSERT_EXPECT_
+#elif defined(COMPILER_GNU)
+#  if __GNUC__ >= 13
+#    define EFLI_ASSERT_EXPECT_
+#  endif
+#elif defined(COMPILER_ICC)
+#  if (__INTEL_COMPILER / 100) >= 13
+#    define EFLI_ASSERT_EXPECT_
+#  endif
+#endif
+
+#ifdef EFLI_ASSERT_EXPECT_
+#  undef  EFLI_ASSERT_EXPECT_
+#  define EFLI_ASSERT_EXPECT_(ichk) __builtin_expect(!!(ichk), 1)
+#else
+#  define EFLI_ASSERT_EXPECT_(ichk) (!!(ichk))
+#endif
 
 /// Assumes `ichk` is inverted
 #define EFLI_ASSERT_BOX_(ichk, str) \
-  do { if(ichk) UNLIKELY { using namespace efl::literals; assert(str ## _Assert); } } while(0)
-
-#define EflDynAssert(...) \
-  static_assert(false, "Cannot use dynamic assertions in fallback!")
+  do { if(ichk) UNLIKELY { using namespace ::efl::literals; assert(str ## _f); } } while(0)
 
 #endif // EFL_ASSERT_ASSERTFALLBACK_HPP

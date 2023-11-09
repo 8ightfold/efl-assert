@@ -3,29 +3,34 @@ include_guard(DIRECTORY)
 
 project(
   efl-assert
-  VERSION 0.1.1
+  VERSION 0.2.0
   LANGUAGES CXX
 )
+
+option(EFL_ASSERT_FALLBACK "Force fallback mode." OFF)
 
 include(cmake/LoopUtils.cmake)
 include(cmake/LocateAssert.cmake)
 include(cmake/LocateLang.cmake)
 
-set(__EFL_ASSERT_TLINC ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT EFL_ASSERT_FALLBACK)
+  set(__EFL_ASSERT_TLINC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(NOT DEFINED EFL_ASSERT_HEADER)
-  __efl_assert_locate(__EFL_ASSERT_HEADER)
-else(NOT DEFINED __EFL_ASSERT_HEADER)
-  message("[efl::assert] Using explicit path to `assert.h`...")
-  if(NOT EXISTS EFL_ASSERT_HEADER)
-    message(FATAL_ERROR "[efl::assert] Could not locate `assert.h`. "
-      "Ensure your path is not relative.")
+  if(NOT DEFINED EFL_ASSERT_HEADER)
+    __efl_assert_locate(__EFL_ASSERT_HEADER)
+  else(NOT DEFINED __EFL_ASSERT_HEADER)
+    message("[efl::assert] Using explicit path to `assert.h`...")
+    if(NOT EXISTS EFL_ASSERT_HEADER)
+      message(FATAL_ERROR "[efl::assert] Could not locate `assert.h`. "
+        "Ensure your path is not relative.")
+    endif()
+    set(__EFL_ASSERT_HEADER ${EFL_ASSERT_HEADER} 
+      CACHE PATH "Explicit path to `assert.h`" FORCE)
   endif()
-  set(__EFL_ASSERT_HEADER ${EFL_ASSERT_HEADER} 
-    CACHE PATH "Explicit path to `assert.h`" FORCE)
+  message("[efl::assert] assert-path: ${__EFL_ASSERT_HEADER}")
+else()
+  message("[efl::assert] force-fallback: ON")
 endif()
-
-message("[efl::assert] assert-path: ${__EFL_ASSERT_HEADER}")
 
 add_subdirectory(conf)
 add_subdirectory(submodules/efl-config)

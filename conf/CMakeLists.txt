@@ -1,3 +1,13 @@
+if(EFL_ASSERT_FALLBACK)
+  set(__EFL_ASSERT_FORCE_FALLBACK ON 
+    CACHE BOOL "Force use of fallback header.")
+  set(__EFL_ASSERT_USE_CODEGENNED OFF 
+    CACHE BOOL "Force use of fallback header." FORCE)
+elseif(DEFINED __EFL_ASSERT_FORCE_FALLBACK)
+  unset(__EFL_ASSERT_FORCE_FALLBACK CACHE)
+  unset(__EFL_ASSERT_USE_CODEGENNED CACHE)
+endif()
+
 if(DEFINED __EFL_ASSERT_USE_CODEGENNED)
   __efl_assert_propagate(__EFL_ASSERT_USE_CODEGENNED)
   return()
@@ -62,9 +72,8 @@ endif()
 
 list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/include")
 list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/submodules/efl-config/include")
-list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DEFLI_ASSERT_USE_CODEGENNED_=1")
 check_cxx_source_compiles("#include \"CompileTest.cpp\"" USE_CODEGENNED)
 
 set(__EFL_ASSERT_USE_CODEGENNED ${USE_CODEGENNED} 
-  CACHE BOOL "Whether or not to use codegenned header.")
+  CACHE BOOL "Whether or not to use codegenned header." FORCE)
 __efl_assert_propagate(__EFL_ASSERT_USE_CODEGENNED)

@@ -20,25 +20,13 @@
 //
 //===----------------------------------------------------------------===//
 
-#pragma once
-
 #ifndef EFL_ASSERT_ASSERT_HPP
 #define EFL_ASSERT_ASSERT_HPP
 
 #include <cassert>
 #include <cstddef>
-#include <efl/Config.hpp>
 
-namespace efl {
-namespace literals {
-    inline bool operator""_Assert(const char*, std::size_t) NOEXCEPT {
-        return false;
-    }
-} // namespace literals
-} // namespace efl
-
-#if defined(EFLI_ASSERT_USE_CODEGENNED_) && \
-  __has_include(<efl/AssertGen.hpp>)
+#if defined(EFLI_ASSERT_USE_CODEGENNED_)
 #  include "AssertGen.hpp"
 #  define EFL_ASSERT_FALLBACK 0
 #else
@@ -46,11 +34,25 @@ namespace literals {
 #  define EFL_ASSERT_FALLBACK 1
 #endif
 
+#if !defined(EFLI_NDEBUG_) && defined(NDEBUG)
+#  define EFLI_NDEBUG_ 1
+#endif
+
 #ifndef EFLI_NDEBUG_
 #  define EflDbgAssert(...) EflAssert(__VA_ARGS__)
+#  define EflDbgDynAssert(...) EflDynAssert(__VA_ARGS__)
 #else
 /// No assert for you!
-#  define EflDbgAssert(...) (void)0
+#  define EflDbgAssert(...) (void)(0)
+#  define EflDbgDynAssert(...) (void)(0)
 #endif
+
+namespace efl {
+namespace literals {
+    ALWAYS_INLINE bool operator""_f(const char*, std::size_t) NOEXCEPT {
+        return false;
+    }
+} // namespace literals
+} // namespace efl
 
 #endif // EFL_ASSERT_ASSERT_HPP
