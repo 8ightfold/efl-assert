@@ -19,10 +19,10 @@ set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}")
 check_cxx_source_compiles("#include \"HasBuiltinExpect.cpp\"" HAS_BUILTIN_EXPECT)
 
 if(HAS_BUILTIN_EXPECT)
-  set(__EFL_ASSERT_EXPECT "__builtin_expect((chk), 1)")
+  set(__EFL_ASSERT_EXPECT "__builtin_expect(!!(chk), 1)")
   message("[efl::assert] builtin-expect: ON")
 else()
-  set(__EFL_ASSERT_EXPECT "(chk)")
+  set(__EFL_ASSERT_EXPECT "(!!(chk))")
   message("[efl::assert] builtin-expect: OFF")
 endif()
 
