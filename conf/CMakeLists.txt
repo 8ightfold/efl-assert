@@ -1,17 +1,21 @@
+if(NOT EFL_ASSERT_FALLBACK STREQUAL __EFL_ASSERT_FALLBACK)
+  set(__EFL_ASSERT_FALLBACK ${EFL_ASSERT_FALLBACK} 
+    CACHE BOOL "Force use of fallback header." FORCE)
+  unset(__EFL_ASSERT_USE_CODEGENNED CACHE)
+  unset(USE_CODEGENNED CACHE)
+endif()
+
 if(EFL_ASSERT_FALLBACK)
-  set(__EFL_ASSERT_FORCE_FALLBACK ON 
-    CACHE BOOL "Force use of fallback header.")
   set(__EFL_ASSERT_USE_CODEGENNED OFF 
     CACHE BOOL "Force use of fallback header." FORCE)
-elseif(DEFINED __EFL_ASSERT_FORCE_FALLBACK)
-  unset(__EFL_ASSERT_FORCE_FALLBACK CACHE)
-  unset(__EFL_ASSERT_USE_CODEGENNED CACHE)
 endif()
 
 if(DEFINED __EFL_ASSERT_USE_CODEGENNED)
   __efl_assert_propagate(__EFL_ASSERT_USE_CODEGENNED)
   return()
 endif()
+
+##=== Builtin Config ========================================##
 
 include(CheckCXXSourceCompiles)
 
@@ -29,49 +33,30 @@ endif()
 set(__EFL_ASSERT_EXPECT ${__EFL_ASSERT_EXPECT} 
   CACHE STRING "Body for __builtin_expect wrapper.")
 
-##=== Assert Parsing ===##
-__efl_assert_find_any(Perl Ruby Python)
-if(DEFINED __EFL_ASSERT_SCRIPT_LANG)
-  set(__EFL_ASSERT_SCRIPT_EXE ${${__EFL_ASSERT_SL}_EXECUTABLE})
-  set(__EFL_ASSERT_SCRIPT_VER ${${__EFL_ASSERT_SL}_VERSION})
-  if("${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Ruby")
-    set(__EFL_ASSERT_SCRIPT_EXT "rb")
-  elseif("${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Perl")
-    set(__EFL_ASSERT_SCRIPT_EXT "pl")
-  elseif("${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Python")
-    set(__EFL_ASSERT_SCRIPT_EXT "py")
-  endif()
-else()
-  message(FATAL_ERROR 
-    "[efl::assert] Could not locate a scripting language (Perl, Ruby, Python).")
-endif()
-
-if("${__EFL_ASSERT_SCRIPT_LANG}" STREQUAL "Python")
-  message(SEND_ERROR 
-    "${__EFL_ASSERT_SCRIPT_LANG} is currently unsupported.")
-endif()
-
+##=== Assert Parsing ========================================##
+__efl_find_perl()
 __efl_assert_parse(${CMAKE_CURRENT_SOURCE_DIR})
-message("[efl::assert] scripting-lang: ${__EFL_ASSERT_SCRIPT_LANG}")
+
 message(DEBUG "[efl::assert] script-path: ${__EFL_PARSER_SCRIPT}")
-message(DEBUG "[efl::assert] scripting-ver: ${__EFL_ASSERT_SCRIPT_VER}")
-message(DEBUG "[efl::assert] scripting-exe: ${__EFL_ASSERT_SCRIPT_EXE}")
+message(DEBUG "[efl::assert] scripting-ver: ${PERL_VERSION}")
+message(DEBUG "[efl::assert] scripting-exe: ${PERL_EXECUTABLE}")
 
 if(__EFL_ASSERT_DEFINITION_ERR STREQUAL "")
   set(__EFL_ASSERT_DEFINITION ${__EFL_ASSERT_DEFINITION} 
     CACHE STRING "The generated assertion definition.")
-  message(DEBUG "[efl::assert] ${__EFL_ASSERT_SCRIPT_LANG}-output: ${__EFL_ASSERT_DEFINITION}")
+  message(DEBUG "[efl::assert] Perl-output: ${__EFL_ASSERT_DEFINITION}")
   configure_file(
-    ${__EFL_ASSERT_TLINC}/include/efl/AssertGen.hpp.in
-    ${__EFL_ASSERT_TLINC}/include/efl/AssertGen.hpp @ONLY
+    ${PROJECT_SOURCE_DIR}/include/efl/AssertGen.hpp.in
+    ${PROJECT_SOURCE_DIR}/include/efl/AssertGen.hpp @ONLY
   )
 else()
   string(STRIP "${__EFL_ASSERT_DEFINITION_ERR}" __EFL_ASSERT_DEFINITION_ERR)
-  message(SEND_ERROR "[efl::assert] ${__EFL_ASSERT_SCRIPT_LANG}-error: `${__EFL_ASSERT_DEFINITION_ERR}`")
+  message(SEND_ERROR "[efl::assert] Perl-error: `${__EFL_ASSERT_DEFINITION_ERR}`")
 endif()
 
-list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/include")
-list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_ASSERT_TLINC}/submodules/efl-config/include")
+get_target_property(__EFL_CONFIG_INCLUDES efl::config INTERFACE_INCLUDE_DIRECTORIES)
+list(APPEND CMAKE_REQUIRED_INCLUDES "${__EFL_CONFIG_INCLUDES}")
+list(APPEND CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 check_cxx_source_compiles("#include \"CompileTest.cpp\"" USE_CODEGENNED)
 
 set(__EFL_ASSERT_USE_CODEGENNED ${USE_CODEGENNED} 

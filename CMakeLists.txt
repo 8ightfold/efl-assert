@@ -3,19 +3,21 @@ include_guard(DIRECTORY)
 
 project(
   efl-assert
-  VERSION 0.2.0
+  VERSION 0.3.0
   LANGUAGES CXX
 )
 
 option(EFL_ASSERT_FALLBACK "Force fallback mode." OFF)
 
+include(EflGetModules)
 include(cmake/LoopUtils.cmake)
 include(cmake/LocateAssert.cmake)
-include(cmake/LocateLang.cmake)
+
+Efl_Getmodules(efl::config)
+
+##=== Locate assert.h =======================================##
 
 if(NOT EFL_ASSERT_FALLBACK)
-  set(__EFL_ASSERT_TLINC ${CMAKE_CURRENT_SOURCE_DIR})
-
   if(NOT DEFINED EFL_ASSERT_HEADER)
     __efl_assert_locate(__EFL_ASSERT_HEADER)
   else(NOT DEFINED __EFL_ASSERT_HEADER)
@@ -32,8 +34,9 @@ else()
   message("[efl::assert] force-fallback: ON")
 endif()
 
+##=== Configure Assert ======================================##
+
 add_subdirectory(conf)
-add_subdirectory(submodules/efl-config)
 
 add_library(__efl_assert INTERFACE)
 target_link_libraries(__efl_assert INTERFACE efl::config)
@@ -49,3 +52,5 @@ else()
 endif()
 
 add_library(efl::assert ALIAS __efl_assert)
+
+# Efl_Getmodules(efl::config)

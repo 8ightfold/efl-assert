@@ -4,7 +4,6 @@ function(__efl_assert_search_retrace __in __out)
   set(__EFL_COUNT 0)
 
   while(NOT (__EFL_ASSERT_FSTUB STREQUAL __EFL_ASSERT_ROOT))
-    # message("stub: ${__EFL_ASSERT_FSTUB}")
     cmake_path(GET __EFL_ASSERT_FSTUB PARENT_PATH __EFL_ASSERT_FSTUB)
     if(IS_DIRECTORY ${__EFL_ASSERT_FSTUB}/include)
       set(__EFL_ASSERT_INC_DIR ${__EFL_ASSERT_FSTUB}/include)
@@ -61,9 +60,9 @@ endmacro()
 
 macro(__efl_assert_parse __dir)
   set(__EFL_PARSER_SCRIPT
-    "${__dir}/ParseAssert.${__EFL_ASSERT_SCRIPT_EXT}")
+    "${__dir}/ParseAssert.pl")
   execute_process(COMMAND 
-    ${__EFL_ASSERT_SCRIPT_EXE} 
+    ${PERL_EXECUTABLE} 
       ${__EFL_PARSER_SCRIPT} ${__EFL_ASSERT_HEADER}
     WORKING_DIRECTORY ${__dir}
     OUTPUT_VARIABLE __EFL_ASSERT_DEFINITION

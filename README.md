@@ -27,7 +27,7 @@ target_link_libraries(your-exe efl::assert)
 ## Dependencies
 
 ``efl::assert`` has to parse ``assert.h``, so a scripting language is required.
-Because of this, you need either ``Perl``, ``Ruby``, or ``Python`` installed and configured for CMake usage.
+Because of this, you need ``Perl`` installed and configured for CMake usage.
 
 If you set ``EFL_ASSERT_FALLBACK`` to ``ON``, the fallback path
 will immediately be taken (though this does defeat the purpose of the library).
