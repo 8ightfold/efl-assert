@@ -56,7 +56,3 @@ definition for the formatting, just make sure it evaluates to a
 
 The ``Dbg`` variants of both functions work the same in debug mode,
 but if ``NDEBUG`` is defined, they become noops.
-
-## Todo
-
-- Add script support for Python.
