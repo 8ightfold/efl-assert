@@ -32,19 +32,19 @@
 
 namespace efl {
 namespace assert {
-    ALWAYS_INLINE void fmt_args(std::ostream&) { }
+  ALWAYS_INLINE void fmt_args(std::ostream&) { }
 
-    template <typename Arg, typename...Args>
-    void fmt_args(std::ostream& os, Arg&& arg, Args&&...args) {
-        fmt_args(os << FWD(arg), FWD(args)...);
-    }
+  template <typename Arg, typename...Args>
+  void fmt_args(std::ostream& os, Arg&& arg, Args&&...args) {
+    fmt_args(os << FWD(arg), FWD(args)...);
+  }
 
-    template <typename...Args>
-    std::string parse_args(Args&&...args) {
-        std::stringstream ss;
-        fmt_args(ss << std::boolalpha, FWD(args)...);
-        return ss.rdbuf()->str();
-    }
+  template <typename...Args>
+  std::string parse_args(Args&&...args) {
+    std::stringstream ss;
+    fmt_args(ss << std::boolalpha, FWD(args)...);
+    return ss.rdbuf()->str();
+  }
 } // namespace assert
 } // namespace efl
 

@@ -49,9 +49,9 @@
 
 namespace efl {
 namespace literals {
-    ALWAYS_INLINE bool operator""_f(const char*, std::size_t) NOEXCEPT {
-        return false;
-    }
+  ALWAYS_INLINE bool operator""_f(const char*, std::size_t) NOEXCEPT {
+    return false;
+  }
 } // namespace literals
 } // namespace efl
 
