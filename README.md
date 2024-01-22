@@ -1,5 +1,7 @@
 # efl-assert
 
+**DEPRECATED**, use efl::core's ``$raw_assert(...)``.
+
 This library's purpose is simple: it extends ``assert``.
 It allows you to swap this:
 
